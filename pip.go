@@ -28,6 +28,8 @@ type pip struct {
 	packageName *string
 }
 
+// Start a new Pip command.
+// https://pip.pypa.io/en/stable/
 func New(binaryName string) *pip {
 	return &pip{
 		binaryName: &binaryName,
@@ -35,17 +37,22 @@ func New(binaryName string) *pip {
 	}
 }
 
+// Enable dry-run.
+// https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-dry-run
 func (p *pip) DryRun() *pip {
 	p.dryRun = true
 	return p
 }
 
+// Install a package.
+// https://pip.pypa.io/en/stable/cli/pip_install/
 func (p *pip) Install(packageName string) *pip {
 	p.packageName = &packageName
 	p.verb = Install
 	return p
 }
 
+// Seals the command so it can be run.
 func (p *pip) Seal() (command, error) {
 	if p.packageName == nil && (p.dryRun || p.verb == Install) {
 		return "", ErrNoPackageName
@@ -72,6 +79,7 @@ func (p *pip) Seal() (command, error) {
 	return command(templatedCmd), nil
 }
 
+// Runs the command.
 func (c *command) Run() error {
 	error := execCommander().Command(string(*c)).Run()
 	return error
