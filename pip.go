@@ -3,6 +3,7 @@ package gopip
 import (
 	"errors"
 	"fmt"
+	"os/exec"
 )
 
 var (
@@ -68,5 +69,7 @@ func (p *pip) Seal() (command, error) {
 	return command(templatedCmd), nil
 }
 
-func (c *command) Run() {
+func (c *command) Run() error {
+	error := exec.Command(string(*c)).Run()
+	return error
 }
