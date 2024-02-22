@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"os/exec"
 	"testing"
 
 	"github.com/CREDOProject/go-pip/shell"
@@ -14,6 +15,10 @@ type myLookPath struct {
 
 func (m myLookPath) LookPath(name string) (string, error) {
 	return m.LookPathFunc(name)
+}
+
+func (m myLookPath) Command(cmd string, args ...string) *exec.Cmd {
+	return nil
 }
 
 func mockExec() execShim {

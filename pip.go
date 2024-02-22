@@ -3,8 +3,11 @@ package gopip
 import (
 	"errors"
 	"fmt"
-	"os/exec"
+
+	"github.com/CREDOProject/go-pip/shell"
 )
+
+var execCommander = shell.NewExecShim
 
 var (
 	ErrNoPackageName = errors.New("Package name not specified")
@@ -70,6 +73,6 @@ func (p *pip) Seal() (command, error) {
 }
 
 func (c *command) Run() error {
-	error := exec.Command(string(*c)).Run()
+	error := execCommander().Command(string(*c)).Run()
 	return error
 }
