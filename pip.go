@@ -3,6 +3,7 @@ package gopip
 import (
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/CREDOProject/go-pip/shell"
 )
@@ -10,21 +11,22 @@ import (
 var execCommander = shell.NewExecShim
 
 var (
-	ErrNoPackageName = errors.New("Package name not specified")
+	ErrNoPackageName = errors.New("Package name not specified.")
+	ErrNoVerb        = errors.New("Verb not specified.")
 )
 
-type Verb string
+type verb string
 type command string
 
 const (
-	Install Verb = "install"
+	Install verb = "install"
 	NoVerb       = ""
 )
 
 type pip struct {
 	binaryName  *string
 	dryRun      bool
-	verb        Verb
+	verb        verb
 	packageName *string
 }
 
@@ -58,6 +60,10 @@ func (p *pip) Seal() (command, error) {
 		return "", ErrNoPackageName
 	}
 
+	if p.verb == NoVerb {
+		return "", ErrNoVerb
+	}
+
 	dryRun := ""
 	if p.dryRun {
 		dryRun = "--dry-run"
@@ -79,8 +85,17 @@ func (p *pip) Seal() (command, error) {
 	return command(templatedCmd), nil
 }
 
+type RunOptions struct {
+	Output *os.File
+}
+
 // Runs the command.
-func (c *command) Run() error {
-	error := execCommander().Command(string(*c)).Run()
+func (c *command) Run(options *RunOptions) error {
+	command := execCommander().Command(string(*c))
+	if options.Output != nil {
+		command.Stdout = options.Output
+		command.Stderr = options.Output
+	}
+	error := command.Run()
 	return error
 }

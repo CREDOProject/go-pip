@@ -6,8 +6,8 @@ import (
 
 func Test_New(t *testing.T) {
 	_, err := New("pip3").Seal()
-	if err != nil {
-		t.Error(err)
+	if err != ErrNoVerb {
+		t.Errorf("Exepcted %s, got: %s", ErrNoVerb, err)
 	}
 }
 
