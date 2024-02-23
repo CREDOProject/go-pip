@@ -2,7 +2,6 @@ package gopip
 
 import (
 	"errors"
-	"fmt"
 	"os"
 
 	"github.com/CREDOProject/go-pip/shell"
@@ -17,8 +16,8 @@ var (
 
 type verb string
 type command struct {
-	bin  *string
-	args *string
+	binaryName      *string
+	binaryArguments []string
 }
 
 const (
@@ -76,17 +75,13 @@ func (p *pip) Seal() (command, error) {
 	if p.packageName != nil {
 		packageName = *p.packageName
 	}
-
-	templatedCmd := fmt.Sprintf(
-		"%s %s %s",
-		string(p.verb),
-		packageName,
-		dryRun,
-	)
-
 	return command{
-		bin:  p.binaryName,
-		args: &templatedCmd,
+		binaryName: p.binaryName,
+		binaryArguments: []string{
+			string(p.verb),
+			packageName,
+			dryRun,
+		},
 	}, nil
 }
 
@@ -96,7 +91,7 @@ type RunOptions struct {
 
 // Runs the command.
 func (c *command) Run(options *RunOptions) error {
-	command := execCommander().Command(*c.bin, *c.args)
+	command := execCommander().Command(*c.binaryName, c.binaryArguments...)
 	if options.Output != nil {
 		command.Stdout = options.Output
 		command.Stderr = options.Output
