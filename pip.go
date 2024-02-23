@@ -16,7 +16,10 @@ var (
 )
 
 type verb string
-type command string
+type command struct {
+	bin  *string
+	args *string
+}
 
 const (
 	Install verb = "install"
@@ -57,11 +60,11 @@ func (p *pip) Install(packageName string) *pip {
 // Seals the command so it can be run.
 func (p *pip) Seal() (command, error) {
 	if p.packageName == nil && (p.dryRun || p.verb == Install) {
-		return "", ErrNoPackageName
+		return command{}, ErrNoPackageName
 	}
 
 	if p.verb == NoVerb {
-		return "", ErrNoVerb
+		return command{}, ErrNoVerb
 	}
 
 	dryRun := ""
@@ -75,14 +78,16 @@ func (p *pip) Seal() (command, error) {
 	}
 
 	templatedCmd := fmt.Sprintf(
-		"%s %s %s %s",
-		*p.binaryName,
+		"%s %s %s",
 		string(p.verb),
 		packageName,
 		dryRun,
 	)
 
-	return command(templatedCmd), nil
+	return command{
+		bin:  p.binaryName,
+		args: &templatedCmd,
+	}, nil
 }
 
 type RunOptions struct {
@@ -91,7 +96,7 @@ type RunOptions struct {
 
 // Runs the command.
 func (c *command) Run(options *RunOptions) error {
-	command := execCommander().Command(string(*c))
+	command := execCommander().Command(*c.bin, *c.args)
 	if options.Output != nil {
 		command.Stdout = options.Output
 		command.Stderr = options.Output
