@@ -21,15 +21,17 @@ type command struct {
 }
 
 const (
-	Install verb = "install"
-	NoVerb       = ""
+	Install  verb = "install"
+	Download verb = "download"
+	NoVerb        = ""
 )
 
 type pip struct {
-	binaryName  *string
-	dryRun      bool
-	verb        verb
-	packageName *string
+	binaryName      *string
+	dryRun          bool
+	verb            verb
+	packageName     *string
+	targetDirectory *string
 }
 
 // Start a new Pip command.
@@ -56,32 +58,44 @@ func (p *pip) Install(packageName string) *pip {
 	return p
 }
 
+// Downloads a package.
+// https://pip.pypa.io/en/stable/cli/pip_download/
+func (p *pip) Download(packageName string, targetDirectory string) *pip {
+	p.packageName = &packageName
+	p.targetDirectory = &targetDirectory
+	p.verb = Download
+	return p
+}
+
 // Seals the command so it can be run.
 func (p *pip) Seal() (command, error) {
 	if p.packageName == nil && (p.dryRun || p.verb == Install) {
 		return command{}, ErrNoPackageName
 	}
 
+	arguments := []string{}
+
 	if p.verb == NoVerb {
 		return command{}, ErrNoVerb
 	}
 
-	dryRun := ""
-	if p.dryRun {
-		dryRun = "--dry-run"
+	arguments = append(arguments, string(p.verb))
+
+	if p.packageName != nil {
+		arguments = append(arguments, *p.packageName)
 	}
 
-	packageName := ""
-	if p.packageName != nil {
-		packageName = *p.packageName
+	if p.dryRun {
+		arguments = append(arguments, "--dry-run")
 	}
+
+	if p.targetDirectory != nil {
+		arguments = append(arguments, "-d", *p.targetDirectory)
+	}
+
 	return command{
-		binaryName: p.binaryName,
-		binaryArguments: []string{
-			string(p.verb),
-			packageName,
-			dryRun,
-		},
+		binaryName:      p.binaryName,
+		binaryArguments: arguments,
 	}, nil
 }
 
