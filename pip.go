@@ -101,6 +101,7 @@ func (p *pip) Seal() (command, error) {
 
 type RunOptions struct {
 	Output *os.File
+	Env    []string
 }
 
 // Runs the command.
@@ -109,6 +110,12 @@ func (c *command) Run(options *RunOptions) error {
 	if options.Output != nil {
 		command.Stdout = options.Output
 		command.Stderr = options.Output
+	} else {
+		command.Stdout = os.Stdout
+		command.Stderr = os.Stderr
+	}
+	if options.Output != nil {
+		command.Env = options.Env
 	}
 	error := command.Run()
 	return error
