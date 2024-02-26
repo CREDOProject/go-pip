@@ -110,11 +110,8 @@ func (c *command) Run(options *RunOptions) error {
 	if options.Output != nil {
 		command.Stdout = options.Output
 		command.Stderr = options.Output
-	} else {
-		command.Stdout = os.Stdout
-		command.Stderr = os.Stderr
 	}
-	if options.Output != nil {
+	if options.Env != nil {
 		command.Env = options.Env
 	}
 	error := command.Run()
