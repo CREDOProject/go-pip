@@ -26,3 +26,28 @@ func Test_Params(t *testing.T) {
 		t.Errorf("Not pip3.")
 	}
 }
+
+func Test_DownloadArgument(t *testing.T) {
+	p := &pip{}
+	packageName := "examplePackage"
+	targetDirectory := "/path/to/target"
+
+	// Call the Download method
+	result, _ := p.Download(packageName, targetDirectory).Seal()
+
+	if !contains[string](result.binaryArguments, "-d") {
+		t.Errorf("Exepcted %s", "-d")
+	}
+	if !contains[string](result.binaryArguments, targetDirectory) {
+		t.Errorf("Exepcted %s", targetDirectory)
+	}
+}
+
+func contains[T comparable](s []T, elem T) bool {
+	for _, a := range s {
+		if a == elem {
+			return true
+		}
+	}
+	return false
+}

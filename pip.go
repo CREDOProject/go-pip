@@ -4,10 +4,10 @@ import (
 	"errors"
 	"os"
 
-	"github.com/CREDOProject/go-pip/shell"
+	"github.com/CREDOProject/sharedutils/shell"
 )
 
-var execCommander = shell.NewExecShim
+var execCommander = shell.New
 
 var (
 	ErrNoPackageName = errors.New("Package name not specified.")
