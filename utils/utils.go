@@ -33,6 +33,6 @@ func PipBinaryFrom(path string) (string, error) {
 // looksLikePip returns true if the given filename looks like a Python
 // executable.
 func looksLikePip(name string) bool {
-	var pipFileRegex = regexp.MustCompile(`^pip3(\d(\.\d\d?)?)?$`)
+	var pipFileRegex = regexp.MustCompile(`^pip3(\.\d\d?)?\.?(\.\d\d?)?$`)
 	return pipFileRegex.MatchString(name)
 }

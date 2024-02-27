@@ -56,9 +56,9 @@ func TestLooksLikePip(t *testing.T) {
 		expected bool
 	}{
 		{"pip3", true},
-		{"pip3.9", false},
-		{"pip3.10", false},
-		{"pip3.10.1", false},
+		{"pip3.9", true},
+		{"pip3.10", true},
+		{"pip3.10.1", true},
 		{"pip3.10.1a", false},    // Invalid, contains characters after the version
 		{"pip3.10.1.1", false},   // Invalid, contains multiple dots after the version
 		{"pip3.10.1.1.1", false}, // Invalid, contains multiple dots after the version
