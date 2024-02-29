@@ -2,13 +2,10 @@ package utils
 
 import (
 	"errors"
-	"regexp"
 
 	"github.com/CREDOProject/sharedutils/files"
 	"github.com/CREDOProject/sharedutils/shell"
 )
-
-const pip = "pip3"
 
 var execCommander = shell.New
 
@@ -33,6 +30,5 @@ func PipBinaryFrom(path string) (string, error) {
 // looksLikePip returns true if the given filename looks like a Python
 // executable.
 func looksLikePip(name string) bool {
-	var pipFileRegex = regexp.MustCompile(`^pip3(\.\d\d?)?\.?(\.\d\d?)?$`)
 	return pipFileRegex.MatchString(name)
 }
