@@ -35,10 +35,10 @@ func Test_DownloadArgument(t *testing.T) {
 	// Call the Download method
 	result, _ := p.Download(packageName, targetDirectory).Seal()
 
-	if !contains[string](result.binaryArguments, "-d") {
+	if !contains(result.binaryArguments, "-d") {
 		t.Errorf("Exepcted %s", "-d")
 	}
-	if !contains[string](result.binaryArguments, targetDirectory) {
+	if !contains(result.binaryArguments, targetDirectory) {
 		t.Errorf("Exepcted %s", targetDirectory)
 	}
 }
