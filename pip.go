@@ -2,6 +2,7 @@ package gopip
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
 	"github.com/CREDOProject/sharedutils/shell"
@@ -29,6 +30,7 @@ const (
 type pip struct {
 	binaryName      *string
 	dryRun          bool
+	noindex         bool
 	verb            verb
 	packageName     *string
 	targetDirectory *string
@@ -47,6 +49,14 @@ func New(binaryName string) *pip {
 // https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-dry-run
 func (p *pip) DryRun() *pip {
 	p.dryRun = true
+	return p
+}
+
+// Disable finding in pypi and specifies a --find-links directory.
+// https://pip.pypa.io/en/stable/cli/pip_install/#finding-packages
+func (p *pip) FindLinks(directory string) *pip {
+	p.noindex = true
+	p.targetDirectory = &directory
 	return p
 }
 
@@ -81,16 +91,21 @@ func (p *pip) Seal() (command, error) {
 
 	arguments = append(arguments, string(p.verb))
 
-	if p.packageName != nil {
-		arguments = append(arguments, *p.packageName)
-	}
-
 	if p.dryRun {
 		arguments = append(arguments, "--dry-run")
 	}
 
-	if p.targetDirectory != nil {
+	if !p.noindex && p.targetDirectory != nil {
 		arguments = append(arguments, "-d", *p.targetDirectory)
+	}
+
+	if p.noindex && p.targetDirectory != nil {
+		arguments = append(arguments, "--no-index")
+		arguments = append(arguments, fmt.Sprintf("--find-links=%s", *p.targetDirectory))
+	}
+
+	if p.packageName != nil {
+		arguments = append(arguments, *p.packageName)
 	}
 
 	return command{
